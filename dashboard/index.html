@@ -3,12 +3,70 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Token Radar: pre-token protocols ranked by implied value</title>
+<title>Token Radar: protocols ranked by what a launch would be worth</title>
+<meta name="description" content="A radar of DeFi protocols that record no token, ranked by the value their launch would plausibly carry, each with a costed farm plan.">
 <link rel="stylesheet" href="app.css">
 </head>
 <body>
 <a class="skip" href="#board">Skip to the board</a>
-<main id="board" tabindex="-1" aria-busy="true"></main>
+
+<header class="masthead">
+  <div class="brand">
+    <span class="pip" aria-hidden="true"></span>
+    <span class="brand-name">Token Radar</span>
+  </div>
+  <dl class="dateline" id="dateline"></dl>
+</header>
+
+<main id="board" tabindex="-1">
+  <section class="intro">
+    <div class="intro-copy">
+      <h1 id="headline">Loading the radar</h1>
+      <p id="lede" class="lede">Reading the snapshot.</p>
+    </div>
+    <dl class="tally" id="tally"></dl>
+  </section>
+
+  <section class="controls" aria-label="Filter the board">
+    <label class="field field-search">
+      <span class="field-label">Search</span>
+      <input id="q" type="search" placeholder="name, chain or category" autocomplete="off" spellcheck="false">
+    </label>
+    <label class="field">
+      <span class="field-label">Category</span>
+      <select id="category"><option value="all">All categories</option></select>
+    </label>
+    <div class="field field-status">
+      <span class="field-label">Set</span>
+      <div class="toggle" role="group" aria-label="Which set to show">
+        <button type="button" id="show-pre" class="on" aria-pressed="true">Pre-token</button>
+        <button type="button" id="show-live" aria-pressed="false">Live token</button>
+      </div>
+    </div>
+    <p class="count" id="count" role="status"></p>
+  </section>
+
+  <p class="hint" id="hint">Every row is scored by one function of the snapshot figures. Select a row for its arithmetic and its farm plan.</p>
+
+  <div class="table-wrap">
+    <table id="table">
+      <caption class="sr-only">Protocols ranked by implied launch value</caption>
+      <thead id="thead"></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+  <p class="empty" id="empty" hidden>No protocol matches that filter.</p>
+
+  <section class="method" id="method"></section>
+
+  <footer class="foot">
+    <p id="foot-source"></p>
+    <p class="foot-note">Implied value is this page's own claim, not a price and not a promise. A protocol's record is not proof it has no token.</p>
+  </footer>
+</main>
+
+<aside class="drawer" id="drawer" hidden aria-live="polite"></aside>
+
 <script src="../data.js"></script>
 <script src="app.js"></script>
 </body>

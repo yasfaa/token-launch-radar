@@ -116,6 +116,7 @@ export interface RadarRow {
   listed_at: string | null;
   age_days: number | null;
   implied_value_usd: number;
+  base_multiple: number;
   growth_multiplier: number;
   maturity_multiplier: number;
 }
@@ -173,33 +174,73 @@ export function ageDays(asOf: string, listedAt: string | null): number | null {
 }
 
 /**
- * How much of a protocol's TVL a token would plausibly claim, by category. Categories that hold
- * capital tightly (lending, CDP, restaking) monetise a larger share of their TVL than ones that pass
- * volume through it (DEXes, bridges), and the whole table is stated in the dashboard. Derived from the
- * category alone: no name is special-cased.
+ * How much of a protocol's TVL a token would plausibly claim, by category. A protocol that holds
+ * capital and monetises it directly (a lending market, a CDP, a risk curator) claims a larger share of
+ * its own TVL than one that passes volume through it (a bridge, a payments rail), and a wrapper claims
+ * least of all. The table covers every category the snapshot carries, so no row falls back silently;
+ * the model's `base_multiple` is used only for a category the table does not name.
  */
 const CATEGORY_MULTIPLE: Readonly<Record<string, number>> = {
+  // Capital held and monetised directly.
   lending: 0.34,
+  'uncollateralized lending': 0.3,
   cdp: 0.32,
+  'cdp manager': 0.3,
+  'risk curators': 0.32,
+  'onchain capital allocator': 0.32,
+  'collateral management': 0.3,
+  'collateral markets': 0.3,
+  // Staking and restaking: a receipt token against a yield stream.
   'liquid staking': 0.3,
-  restaking: 0.3,
   'liquid restaking': 0.3,
-  'leveraged farming': 0.28,
+  restaking: 0.3,
+  'staking pool': 0.28,
+  // Yield-seeking venues.
   yield: 0.26,
   'yield aggregator': 0.26,
-  dexes: 0.2,
-  dex: 0.2,
-  derivatives: 0.22,
-  perpetual: 0.22,
-  options: 0.22,
-  bridge: 0.16,
-  'canonical bridge': 0.16,
+  'leveraged farming': 0.24,
+  farm: 0.24,
+  'liquidity manager': 0.24,
   rwa: 0.24,
+  // Trading venues and structured products.
+  derivatives: 0.22,
+  'interest rate derivatives': 0.2,
+  options: 0.2,
+  'options vault': 0.2,
+  synthetics: 0.2,
+  'basis trading': 0.2,
+  indexes: 0.22,
+  dex: 0.2,
+  dexs: 0.2,
+  'prediction market': 0.2,
+  // Infrastructure and rails.
+  bridge: 0.16,
+  'cross chain bridge': 0.16,
+  'canonical bridge': 0.14,
+  chain: 0.22,
+  'ai agents': 0.22,
+  'decentralized ai': 0.22,
+  cedefi: 0.22,
+  'decentralized btc': 0.22,
+  // Assets, wrappers and the rest.
+  'anchor btc': 0.2,
+  'restaked btc': 0.2,
   stablecoin: 0.18,
+  'stablecoin issuer': 0.18,
+  'dual-token stablecoin': 0.18,
+  'reserve currency': 0.18,
+  'algo-stables': 0.16,
+  privacy: 0.18,
   insurance: 0.2,
-  prediction: 0.2,
-  services: 0.2,
-  infrastructure: 0.22,
+  dor: 0.2,
+  launchpad: 0.2,
+  'nft marketplace': 0.14,
+  'token locker': 0.14,
+  'governance incentives': 0.14,
+  payments: 0.16,
+  'crypto card issuer': 0.16,
+  'otc marketplace': 0.16,
+  'stablecoin wrapper': 0.12,
 };
 
 /** The base multiple a category earns, its own when the table names it, else the model's default. */
@@ -428,6 +469,7 @@ export function radarRow(row: BoardRow): RadarRow {
     listed_at: row.listed_at,
     age_days: row.age_days,
     implied_value_usd: row.implied_value_usd,
+    base_multiple: row.model.base_multiple,
     growth_multiplier: row.model.growth_multiplier,
     maturity_multiplier: row.model.maturity_multiplier,
   };
